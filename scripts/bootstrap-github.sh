@@ -39,13 +39,24 @@ git push -u origin HEAD
 
 echo "==> Applying recommended branch protection on main (best effort)"
 OWNER_REPO="$(gh repo view --json nameWithOwner -q .nameWithOwner)"
-gh api -X PUT "repos/${OWNER_REPO}/branches/main/protection" \
+if ! gh api -X PUT "repos/${OWNER_REPO}/branches/main/protection" \
   -H "Accept: application/vnd.github+json" \
-  -f required_status_checks='{"strict":true,"contexts":["unit-and-jar-smoke","docker-compose-smoke"]}' \
-  -F enforce_admins=true \
-  -f required_pull_request_reviews='{"required_approving_review_count":1}' \
-  -F restrictions=null \
-  || echo "WARN: Could not apply branch protection (org/plan permissions). See docs/REPOSITORY_SETUP.md"
+  --input - <<'JSON'
+{
+  "required_status_checks": {
+    "strict": true,
+    "contexts": ["unit-and-jar-smoke", "docker-compose-smoke"]
+  },
+  "enforce_admins": false,
+  "required_pull_request_reviews": null,
+  "restrictions": null,
+  "allow_force_pushes": false,
+  "allow_deletions": false
+}
+JSON
+then
+  echo "WARN: Could not apply branch protection (org/plan permissions). See docs/REPOSITORY_SETUP.md"
+fi
 
 echo "==> Remote bootstrap complete"
 echo "    $(git remote get-url origin)"

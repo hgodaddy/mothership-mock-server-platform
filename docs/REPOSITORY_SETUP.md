@@ -14,7 +14,7 @@ This closes the Sprint 1 gap: the project must exist as a **versioned Git reposi
 | `origin` | `https://github.com/hgodaddy/mothership-mock-server-platform.git` |
 | CODEOWNERS | `@hgodaddy` (personal remote owner) |
 | CI workflow | `.github/workflows/ci.yml` — jobs `unit-and-jar-smoke`, `docker-compose-smoke` |
-| Branch protection | Enabled on `main` — requires PR + both CI checks; admins enforced |
+| Branch protection | Enabled on `main` — required status checks `unit-and-jar-smoke` + `docker-compose-smoke` (solo-owner: PR reviews not required; admins may bypass for hotfixes) |
 
 Auth scopes required for bootstrap / workflow push: `repo`, `workflow`.
 
@@ -79,15 +79,15 @@ git push -u origin main
 
 ## 4. Branch protection (`main`)
 
-Apply via bootstrap script or GitHub **Settings → Branches**. Recommended rules:
+Apply via bootstrap script or GitHub **Settings → Branches**. Current `main` rules:
 
-- Require pull request reviews (1)
-- Require status checks to pass:
+- Require status checks to pass before merge/push (strict):
   - `unit-and-jar-smoke`
   - `docker-compose-smoke`
-- Do not allow bypassing for admins (optional but preferred)
+- Disallow force pushes and branch deletion
+- PR review requirement deferred until a multi-reviewer org team exists (solo personal remote)
 
-**Plan note:** classic branch protection is **enabled** on this repository's `main` branch (required PR review + both CI checks, admins enforced). If API calls fail on another plan/org, create a repository ruleset in the UI with the same required checks.
+**Plan note:** classic branch protection is **enabled** on this repository's `main` branch with required CI checks. When the repo moves under an org with reviewers, re-enable required PR reviews in bootstrap.
 
 ---
 

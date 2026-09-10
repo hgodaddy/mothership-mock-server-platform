@@ -25,7 +25,7 @@ The Sprint 1 POC is accepted when all criteria below pass on a local machine (na
 | ENV-02 | `.env.example` documents required variables | Present at repo root | **PASS** |
 | ENV-03 | Docker image builds successfully | `./scripts/verify-compose.sh` (Colima) | **PASS** |
 | ENV-04 | Compose stack starts mock API with Redis state | `/ready` → `"backend":"redis"` + smoke | **PASS** |
-| ENV-05 | CI workflow exists and is runnable | `.github/workflows/ci.yml` + Actions run | **PASS** (see Actions URL after push) |
+| ENV-05 | CI workflow exists and is runnable | https://github.com/hgodaddy/mothership-mock-server-platform/actions/runs/34497804644 | **PASS** |
 | ENV-06 | Shared git remote documented / bootstrapped | `origin` + `docs/REPOSITORY_SETUP.md` | **PASS** |
 | ENV-07 | Optional API key auth implemented (off by default) | `MMSP_API_KEY_ENABLED` / `X-API-Key` | **PASS** |
 
@@ -37,7 +37,7 @@ Local proof commands used for ENV-03/04:
 ./scripts/verify-redis.sh
 ```
 
-Branch protection on `main` is enabled (required PR + `unit-and-jar-smoke` + `docker-compose-smoke`, admins enforced).
+Branch protection on `main` requires both CI status checks (`unit-and-jar-smoke`, `docker-compose-smoke`).
 
 ---
 
