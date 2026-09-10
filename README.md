@@ -16,7 +16,7 @@
 | Task | Deliverable |
 |------|-------------|
 | **1. MVP Scope & Acceptance Criteria** | [`docs/MVP_SCOPE.md`](docs/MVP_SCOPE.md) · [`docs/API_LIST.md`](docs/API_LIST.md) · [`docs/SCENARIO_LIST.md`](docs/SCENARIO_LIST.md) · [`docs/ACCEPTANCE_CRITERIA.md`](docs/ACCEPTANCE_CRITERIA.md) |
-| **2. Initial Environment & Repository Setup** | Maven Wrapper, `.env.example`, Docker/Compose with Redis state, CI, CODEOWNERS, setup scripts |
+| **2. Initial Environment & Repository Setup** | Maven Wrapper, `.env.example`, Docker/Compose (Colima-ready) with Redis, CI, CODEOWNERS, GitHub remote, setup scripts |
 | **3. Core Mock Server Framework Skeleton** | Spring Boot app with routing, health, scenarios, 5 MVP APIs, Swagger, metrics, agent stubs |
 
 Full sequential deployment steps: **[`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)**
@@ -85,6 +85,7 @@ export JAVA_HOME=/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home
 ## Docker Compose
 
 ```bash
+./scripts/setup-docker-local.sh   # Colima + docker CLI if Docker Desktop is absent
 ./scripts/verify-compose.sh
 # or
 docker compose up --build -d
@@ -94,6 +95,8 @@ docker compose down
 ```
 
 Compose uses **Redis** for device/scenario state. Native `./scripts/run-local.sh` uses **in-memory** state unless `REDIS_ENABLED=true`.
+
+Runtime image uses `eclipse-temurin:17-jre` (multi-arch, including Apple Silicon).
 
 ---
 

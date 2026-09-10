@@ -10,8 +10,8 @@ This guide deploys the **Java / Spring Boot** MMSP POC locally. Choose **Path A 
 |------|-----------------|-------|
 | JDK | 17+ (Temurin / OpenJDK) | `"$JAVA_HOME/bin/java" -version` |
 | Maven | 3.9+ **or Maven Wrapper** | `./mvnw -v` |
-| Docker Desktop | 24+ (Path B) | `docker -v` |
-| Docker Compose | v2 (Path B) | `docker compose version` |
+| Docker runtime | Docker Desktop **or** Colima | `docker info` |
+| Docker Compose | v2 plugin | `docker compose version` |
 | curl / python3 | any | used by smoke/demo scripts |
 
 ### macOS Homebrew JAVA_HOME tip
@@ -21,6 +21,12 @@ export JAVA_HOME=/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home
 export PATH="$JAVA_HOME/bin:$PATH"
 ```
 
+### macOS without Docker Desktop (Colima)
+
+```bash
+./scripts/setup-docker-local.sh
+# starts Colima and configures DOCKER_HOST for the docker CLI
+```
 ---
 
 ## Path A — Native Java (fastest for development)

@@ -55,12 +55,14 @@ jobs:
       - name: Build and start Compose stack
         run: docker compose up --build -d
 
-      - name: Wait for API health
+      - name: Wait for API health (Redis-backed)
         run: |
           for i in $(seq 1 60); do
             if curl -fsS http://127.0.0.1:8080/health >/dev/null; then
-              echo "Compose stack is up"
-              curl -fsS http://127.0.0.1:8080/ready
+              READY="$(curl -fsS http://127.0.0.1:8080/ready)"
+              echo "$READY"
+              echo "$READY" | grep -q '"backend":"redis"'
+              echo "Compose stack is up with Redis state"
               exit 0
             fi
             sleep 2

@@ -24,7 +24,7 @@ Open pull requests into `main`. CODEOWNERS will request review from the default 
 
 1. `./mvnw test`
 2. `./scripts/smoke-test.sh` against a running instance
-3. If you changed Docker files, `./scripts/verify-compose.sh`
+3. If you changed Docker files, `./scripts/setup-docker-local.sh && ./scripts/verify-compose.sh`
 
 ## Repository bootstrap (first time on GitHub)
 

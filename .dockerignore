@@ -1,0 +1,15 @@
+.git
+.github
+.idea
+.env
+logs
+*.log
+target
+.redis-data
+tmp
+.cache
+*.iml
+.DS_Store
+docs
+scripts
+*.md

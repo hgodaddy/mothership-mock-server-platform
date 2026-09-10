@@ -4,24 +4,24 @@ This closes the Sprint 1 gap: the project must exist as a **versioned Git reposi
 
 ---
 
-## Current remote (created 2026-09-10)
+## Current remote (verified 2026-09-10)
 
 | Item | Value |
 |------|--------|
 | GitHub repo | https://github.com/hgodaddy/mothership-mock-server-platform |
 | Visibility | Private |
-| Local branch | `main` @ first baseline commit |
+| Local branch | `main` |
 | `origin` | `https://github.com/hgodaddy/mothership-mock-server-platform.git` |
+| CODEOWNERS | `@hgodaddy` (personal remote owner) |
+| CI workflow | `.github/workflows/ci.yml` — jobs `unit-and-jar-smoke`, `docker-compose-smoke` |
 
-The GitHub repository was **created**. The first push of `.github/workflows/ci.yml` was **rejected** because the logged-in GitHub CLI token does not include the `workflow` scope. Complete the push with:
+Auth scopes required for bootstrap / workflow push: `repo`, `workflow`.
 
 ```bash
 gh auth refresh -h github.com -s repo,workflow
-cd /Users/hsrivastava/Projects/mothership-mock-server-platform
-git push -u origin main
 ```
 
-Then confirm CI at: https://github.com/hgodaddy/mothership-mock-server-platform/actions
+CI evidence URL: https://github.com/hgodaddy/mothership-mock-server-platform/actions
 
 ---
 
@@ -32,7 +32,7 @@ cd /Users/hsrivastava/Projects/mothership-mock-server-platform
 git status
 ```
 
-The first baseline commit includes the Java POC, Docker, Maven Wrapper, CI, Redis wiring, optional API-key auth, and docs.
+Baseline includes the Java POC, Docker (arm64-safe image), Maven Wrapper, CI, Redis wiring, optional API-key auth, and docs.
 
 ---
 
@@ -68,7 +68,7 @@ git push -u origin main
 
 ## 3. CODEOWNERS
 
-`.github/CODEOWNERS` currently assigns `*` to `@hsrivastava`. Update this to your GitHub org team, for example:
+`.github/CODEOWNERS` assigns `*` to `@hgodaddy` on this personal remote. Update to your GitHub org team when available:
 
 ```
 *  @your-org/pos-qa-engineering
@@ -76,9 +76,9 @@ git push -u origin main
 
 ---
 
-## 4. Recommended branch protection (`main`)
+## 4. Branch protection (`main`)
 
-Apply in GitHub **Settings → Branches**, or via the bootstrap script. Recommended rules:
+Apply via bootstrap script or GitHub **Settings → Branches**. Recommended rules:
 
 - Require pull request reviews (1)
 - Require status checks to pass:
@@ -86,25 +86,30 @@ Apply in GitHub **Settings → Branches**, or via the bootstrap script. Recommen
   - `docker-compose-smoke`
 - Do not allow bypassing for admins (optional but preferred)
 
-If the API call fails (personal **free** private repos do not support branch protection — GitHub Pro or a public repo is required), apply the same rules in the GitHub UI after upgrading or making the repository public.
+**Plan note:** personal **free** private repositories often reject classic branch-protection API calls. In that case either:
+
+1. Make the repository public, or upgrade to GitHub Pro, then re-run `./scripts/bootstrap-github.sh`, **or**
+2. Create a repository ruleset in the UI with the same required checks.
+
+Record the outcome under ENV-06 evidence.
 
 ---
 
 ## 5. Prove CI on the remote
 
-After the first push:
+After push:
 
 1. Open **Actions** on the GitHub repository.
-2. Confirm workflow **MMSP Java CI** ran for `unit-and-jar-smoke` and `docker-compose-smoke`.
+2. Confirm workflow **MMSP Java CI** ran green for `unit-and-jar-smoke` and `docker-compose-smoke`.
 3. Keep the Actions URL as ENV-05 evidence.
 
-**This machine:** Docker Desktop is not installed, so `./scripts/verify-compose.sh` cannot run locally. Redis wiring was proven with `./scripts/verify-redis.sh`. Compose smoke is intended to run on GitHub Actions (`docker-compose-smoke`) after the first successful push.
-
-Local equivalent (no GitHub required):
+Local equivalents:
 
 ```bash
 ./scripts/ci-local.sh
+./scripts/setup-docker-local.sh   # Colima + docker CLI if Docker Desktop is absent
 ./scripts/verify-compose.sh
+./scripts/verify-redis.sh
 ```
 
 ---
