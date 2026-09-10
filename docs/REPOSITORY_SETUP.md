@@ -14,6 +14,7 @@ This closes the Sprint 1 gap: the project must exist as a **versioned Git reposi
 | `origin` | `https://github.com/hgodaddy/mothership-mock-server-platform.git` |
 | CODEOWNERS | `@hgodaddy` (personal remote owner) |
 | CI workflow | `.github/workflows/ci.yml` — jobs `unit-and-jar-smoke`, `docker-compose-smoke` |
+| Branch protection | Enabled on `main` — requires PR + both CI checks; admins enforced |
 
 Auth scopes required for bootstrap / workflow push: `repo`, `workflow`.
 
@@ -86,12 +87,7 @@ Apply via bootstrap script or GitHub **Settings → Branches**. Recommended rule
   - `docker-compose-smoke`
 - Do not allow bypassing for admins (optional but preferred)
 
-**Plan note:** personal **free** private repositories often reject classic branch-protection API calls. In that case either:
-
-1. Make the repository public, or upgrade to GitHub Pro, then re-run `./scripts/bootstrap-github.sh`, **or**
-2. Create a repository ruleset in the UI with the same required checks.
-
-Record the outcome under ENV-06 evidence.
+**Plan note:** classic branch protection is **enabled** on this repository's `main` branch (required PR review + both CI checks, admins enforced). If API calls fail on another plan/org, create a repository ruleset in the UI with the same required checks.
 
 ---
 

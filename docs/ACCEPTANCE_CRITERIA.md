@@ -37,7 +37,7 @@ Local proof commands used for ENV-03/04:
 ./scripts/verify-redis.sh
 ```
 
-Branch protection on free private repos may be plan-limited; bootstrap applies it best-effort and documents the result.
+Branch protection on `main` is enabled (required PR + `unit-and-jar-smoke` + `docker-compose-smoke`, admins enforced).
 
 ---
 
