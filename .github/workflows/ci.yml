@@ -1,0 +1,76 @@
+name: MMSP Java CI
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+
+jobs:
+  unit-and-jar-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+
+      - name: Unit tests and package
+        run: ./mvnw -B test package
+
+      - name: Start MMSP (in-memory)
+        run: |
+          java -jar target/mothership-mock-server-platform-0.1.0.jar &
+          echo $! > mmsp.pid
+          for i in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:8080/health >/dev/null; then
+              echo "MMSP is up"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "MMSP failed to start"
+          exit 1
+
+      - name: Smoke tests
+        run: bash scripts/smoke-test.sh
+
+      - name: Stop MMSP
+        if: always()
+        run: |
+          if [[ -f mmsp.pid ]]; then
+            kill "$(cat mmsp.pid)" || true
+          fi
+
+  docker-compose-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build and start Compose stack
+        run: docker compose up --build -d
+
+      - name: Wait for API health
+        run: |
+          for i in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:8080/health >/dev/null; then
+              echo "Compose stack is up"
+              curl -fsS http://127.0.0.1:8080/ready
+              exit 0
+            fi
+            sleep 2
+          done
+          docker compose logs
+          exit 1
+
+      - name: Smoke tests against Compose
+        run: bash scripts/smoke-test.sh
+
+      - name: Tear down
+        if: always()
+        run: docker compose down -v

@@ -1,0 +1,16 @@
+target/
+.idea/
+*.iml
+.DS_Store
+.env
+logs/
+*.log
+.redis-data/
+tmp/
+.cache/
+*.class
+.classpath
+.project
+.settings/
+bin/
+out/

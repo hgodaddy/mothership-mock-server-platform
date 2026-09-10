@@ -1,0 +1,291 @@
+openapi: 3.0.3
+info:
+  title: Mothership Mock Server Platform (MMSP) API
+  description: |
+    Sprint 1 POC APIs for Mission Control device simulation.
+    Use header `X-MMSP-Scenario` to override the active scenario per request.
+  version: 0.1.0
+  contact:
+    name: POS QA Engineering
+    email: hemant.srivastava@example.com
+
+servers:
+  - url: http://localhost:8080
+    description: Local POC
+
+tags:
+  - name: Platform
+  - name: Devices
+  - name: Scenarios
+
+paths:
+  /health:
+    get:
+      tags: [Platform]
+      summary: Liveness probe
+      responses:
+        '200':
+          description: Service is alive
+
+  /ready:
+    get:
+      tags: [Platform]
+      summary: Readiness probe
+      responses:
+        '200':
+          description: Service is ready
+        '503':
+          description: Service is not ready
+
+  /metrics:
+    get:
+      tags: [Platform]
+      summary: Prometheus metrics
+      responses:
+        '200':
+          description: Prometheus text exposition
+
+  /api/v1/devices/register:
+    post:
+      tags: [Devices]
+      summary: Register a simulated device
+      parameters:
+        - $ref: '#/components/parameters/ScenarioHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceRegisterRequest'
+            example:
+              deviceSerial: POS-DEVICE-1001
+              deviceType: PAYMENT_TERMINAL
+              firmwareVersion: 2.4.1
+              siteId: STORE-42
+      responses:
+        '201':
+          description: Device registered
+        '400':
+          description: Validation failure
+        '500':
+          description: Internal error scenario
+        '503':
+          description: Device offline / unavailable scenario
+        '504':
+          description: Timeout scenario
+
+  /api/v1/devices:
+    get:
+      tags: [Devices]
+      summary: List simulated devices
+      responses:
+        '200':
+          description: Device list
+
+  /api/v1/devices/{deviceId}:
+    get:
+      tags: [Devices]
+      summary: Get device by id
+      parameters:
+        - $ref: '#/components/parameters/DeviceId'
+      responses:
+        '200':
+          description: Device found
+        '404':
+          description: Device not found
+
+  /api/v1/devices/{deviceId}/status:
+    put:
+      tags: [Devices]
+      summary: Update device status / state
+      parameters:
+        - $ref: '#/components/parameters/DeviceId'
+        - $ref: '#/components/parameters/ScenarioHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceStatusRequest'
+      responses:
+        '200':
+          description: Status updated
+
+  /api/v1/devices/{deviceId}/heartbeat:
+    post:
+      tags: [Devices]
+      summary: Device heartbeat
+      parameters:
+        - $ref: '#/components/parameters/DeviceId'
+        - $ref: '#/components/parameters/ScenarioHeader'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HeartbeatRequest'
+      responses:
+        '200':
+          description: Heartbeat acknowledged
+
+  /api/v1/devices/{deviceId}/commands:
+    post:
+      tags: [Devices]
+      summary: Execute / accept a device command
+      parameters:
+        - $ref: '#/components/parameters/DeviceId'
+        - $ref: '#/components/parameters/ScenarioHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommandRequest'
+      responses:
+        '202':
+          description: Command accepted
+
+  /api/v1/devices/{deviceId}/telemetry:
+    post:
+      tags: [Devices]
+      summary: Ingest device telemetry
+      parameters:
+        - $ref: '#/components/parameters/DeviceId'
+        - $ref: '#/components/parameters/ScenarioHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TelemetryRequest'
+      responses:
+        '202':
+          description: Telemetry accepted
+
+  /api/v1/devices/{deviceId}/scenario:
+    put:
+      tags: [Scenarios]
+      summary: Set per-device scenario override
+      parameters:
+        - $ref: '#/components/parameters/DeviceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScenarioSetRequest'
+      responses:
+        '200':
+          description: Device scenario updated
+
+  /api/v1/scenarios:
+    get:
+      tags: [Scenarios]
+      summary: List scenarios and active global scenario
+      responses:
+        '200':
+          description: Scenario catalog
+
+  /api/v1/scenarios/active:
+    put:
+      tags: [Scenarios]
+      summary: Set global active scenario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScenarioSetRequest'
+      responses:
+        '200':
+          description: Global scenario updated
+
+components:
+  parameters:
+    DeviceId:
+      name: deviceId
+      in: path
+      required: true
+      schema:
+        type: string
+    ScenarioHeader:
+      name: X-MMSP-Scenario
+      in: header
+      required: false
+      schema:
+        type: string
+        enum: [success, timeout, device_offline, internal_error, validation_failure]
+
+  schemas:
+    DeviceRegisterRequest:
+      type: object
+      required: [deviceSerial, deviceType]
+      properties:
+        deviceSerial:
+          type: string
+        deviceType:
+          type: string
+        firmwareVersion:
+          type: string
+        siteId:
+          type: string
+        metadata:
+          type: object
+          additionalProperties: true
+
+    DeviceStatusRequest:
+      type: object
+      required: [state]
+      properties:
+        state:
+          type: string
+          enum: [online, offline, busy, error, maintenance]
+        reason:
+          type: string
+
+    HeartbeatRequest:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        cpuPercent:
+          type: number
+        memoryPercent:
+          type: number
+
+    CommandRequest:
+      type: object
+      required: [commandType]
+      properties:
+        commandType:
+          type: string
+        correlationId:
+          type: string
+        payload:
+          type: object
+          additionalProperties: true
+
+    TelemetryRequest:
+      type: object
+      required: [metricType]
+      properties:
+        metricType:
+          type: string
+        recordedAt:
+          type: string
+          format: date-time
+        values:
+          type: object
+          additionalProperties: true
+
+    ScenarioSetRequest:
+      type: object
+      required: [scenario]
+      properties:
+        scenario:
+          type: string
+          enum: [success, timeout, device_offline, internal_error, validation_failure]
+        latencyMs:
+          type: integer
+          minimum: 0

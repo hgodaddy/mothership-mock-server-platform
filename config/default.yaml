@@ -1,0 +1,36 @@
+platform:
+  name: MMSP
+  version: 0.1.0
+  description: Mothership Mock Server Platform Sprint 1 POC
+
+server:
+  port: 8080
+  host: 0.0.0.0
+  apiPrefix: /api/v1
+
+defaults:
+  scenario: success
+  latencyMs: 50
+  timeoutLatencyMs: 3000
+
+deviceStates:
+  - online
+  - offline
+  - busy
+  - error
+  - maintenance
+
+logging:
+  level: info
+  requestLogging: true
+
+metrics:
+  enabled: true
+
+agents:
+  stability:
+    enabled: true
+    mode: stub
+  enhancement:
+    enabled: true
+    mode: stub

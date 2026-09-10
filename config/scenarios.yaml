@@ -1,0 +1,40 @@
+scenarios:
+  success:
+    key: success
+    description: Happy-path responses for all MVP APIs
+    httpStatusOverride: null
+    latencyMs: 50
+    forceDeviceState: null
+
+  timeout:
+    key: timeout
+    description: Artificial delay followed by gateway timeout style failure
+    httpStatusOverride: 504
+    latencyMs: 3000
+    errorCode: TIMEOUT
+    errorMessage: Simulated upstream timeout
+
+  device_offline:
+    key: device_offline
+    description: Device unavailable / offline simulation
+    httpStatusOverride: 503
+    latencyMs: 80
+    errorCode: DEVICE_OFFLINE
+    errorMessage: Device is offline or unavailable
+    forceDeviceState: offline
+
+  internal_error:
+    key: internal_error
+    description: Simulated platform internal failure
+    httpStatusOverride: 500
+    latencyMs: 40
+    errorCode: INTERNAL_ERROR
+    errorMessage: Simulated internal platform failure
+
+  validation_failure:
+    key: validation_failure
+    description: Forced validation failure for negative testing
+    httpStatusOverride: 400
+    latencyMs: 30
+    errorCode: VALIDATION_FAILURE
+    errorMessage: Request failed mock validation rules for scenario validation_failure

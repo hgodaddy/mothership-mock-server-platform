@@ -1,0 +1,71 @@
+server:
+  port: ${PORT:8080}
+  address: ${HOST:0.0.0.0}
+
+spring:
+  application:
+    name: MMSP
+  jackson:
+    default-property-inclusion: non_null
+
+mmsp:
+  platform-name: ${PLATFORM_NAME:MMSP}
+  platform-version: ${PLATFORM_VERSION:0.1.0}
+  api-prefix: ${API_PREFIX:/api/v1}
+  default-scenario: ${DEFAULT_SCENARIO:success}
+  default-latency-ms: ${DEFAULT_LATENCY_MS:50}
+  scenarios-file: ${SCENARIOS_FILE:classpath:config/scenarios.yaml}
+  redis-enabled: ${REDIS_ENABLED:false}
+  redis-url: ${REDIS_URL:redis://localhost:6379}
+  request-logging: ${REQUEST_LOGGING:true}
+  metrics-enabled: ${METRICS_ENABLED:true}
+  device-states:
+    - online
+    - offline
+    - busy
+    - error
+    - maintenance
+  agents:
+    stability-enabled: true
+    enhancement-enabled: true
+  auth:
+    enabled: ${MMSP_API_KEY_ENABLED:false}
+    api-key: ${MMSP_API_KEY:}
+    header-name: ${MMSP_API_KEY_HEADER:X-API-Key}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: mmsp
+
+springdoc:
+  api-docs:
+    path: /api/openapi
+  swagger-ui:
+    path: /api/docs
+    tags-sorter: alpha
+    operations-sorter: alpha
+
+logging:
+  level:
+    root: INFO
+    com.mmsp: ${LOG_LEVEL:INFO}
+  file:
+    name: logs/mmsp-combined.log
+
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+
+mmsp:
+  redis-enabled: ${REDIS_ENABLED:true}
+  redis-url: ${REDIS_URL:redis://redis:6379}
